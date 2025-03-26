@@ -47,7 +47,6 @@
 
       .title {
         font-size: clamp(24px, 7vw, 32px);
-        /* font-weight: ; */
         color: #ffffff;
         letter-spacing: 1px;
       }
@@ -58,7 +57,6 @@
         padding: 5px 15px;
         border-radius: 5px;
         font-size: clamp(16px, 5vw, 20px);
-        /* font-weight: bold; */
         text-shadow: 1px 1px 0px #000;
         letter-spacing: 1px;
       }
@@ -99,15 +97,9 @@
       }
 
       @keyframes pop {
-        0% {
-          transform: scale(0.95);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(0.95);
-        }
+        0% { transform: scale(0.95); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(0.95); }
       }
 
       .tile img {
@@ -124,15 +116,9 @@
       }
 
       @keyframes imgPop {
-        0% {
-          transform: scale(0.95);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(0.95);
-        }
+        0% { transform: scale(0.95); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(0.95); }
       }
 
       .controls-info {
@@ -150,7 +136,6 @@
         border-radius: 5px;
         padding: 8px 15px;
         font-size: clamp(14px, 4vw, 18px);
-        /* font-weight: bold; */
         cursor: pointer;
         margin-top: 10px;
         font-family: "Impact", sans-serif;
@@ -199,12 +184,8 @@
       }
 
       @keyframes float {
-        0% {
-          transform: translate(-100px, -100px) rotate(0deg);
-        }
-        100% {
-          transform: translate(100vw, 100vh) rotate(360deg);
-        }
+        0% { transform: translate(-100px, -100px) rotate(0deg); }
+        100% { transform: translate(100vw, 100vh) rotate(360deg); }
       }
 
       .wow-effect {
@@ -227,7 +208,6 @@
         animation: wow 0.6s ease-out;
       }
 
-      /* New direction indicator style */
       .direction-indicator {
         position: absolute;
         top: 5%;
@@ -245,57 +225,26 @@
       }
 
       @keyframes showDirection {
-        0% {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0.5);
-        }
-        50% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1.2);
-        }
-        100% {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(1.5);
-        }
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
       }
 
       @keyframes wow {
-        0% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(0.5);
-        }
-        50% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1.2);
-        }
-        100% {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(1.5);
-        }
+        0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
       }
 
       @media (max-height: 600px) {
-        .game-container {
-          padding: 10px;
-        }
-
-        .header {
-          margin-bottom: 10px;
-        }
-
-        .grid {
-          grid-gap: 1.5%;
-        }
+        .game-container { padding: 10px; }
+        .header { margin-bottom: 10px; }
+        .grid { grid-gap: 1.5%; }
       }
 
       @media (max-width: 350px) {
-        .game-container {
-          padding: 8px;
-        }
-
-        .grid {
-          grid-gap: 1%;
-        }
+        .game-container { padding: 8px; }
+        .grid { grid-gap: 1%; }
       }
     </style>
   </head>
@@ -336,7 +285,7 @@
           this.backgroundMusic = document.getElementById("backgroundMusic");
 
           // Audio settings
-          this.backgroundMusic.volume = 0.3; // Lower volume for background
+          this.backgroundMusic.volume = 0.3;
           this.swipeSound.volume = 0.7;
           this.pointSound.volume = 0.7;
           this.gameOverSound.volume = 0.8;
@@ -378,7 +327,6 @@
             2048: "img/2048.png",
           };
 
-          // Direction control images
           this.directionImages = {
             up: "img/up.png",
             down: "img/down.png",
@@ -386,12 +334,12 @@
             right: "img/right.png",
           };
 
-          // Use images by default
           this.useTextFallback = false;
           this.checkImages();
 
-          // Start background music
-          this.playBackgroundMusic();
+          // Start all sounds immediately
+          this.initializeAudio();
+
           this.initGrid();
           this.addRandomTile();
           this.addRandomTile();
@@ -399,15 +347,37 @@
           this.setupControls();
           this.addFloatingMemes();
           this.setupMusicAutoplay();
-          // Setup restart button
+
           this.restartBtn.addEventListener("click", () => this.restart());
           document
             .querySelector(".game-over-overlay .restart-btn")
             .addEventListener("click", () => this.restart());
 
-          // Handle orientation changes
           window.addEventListener("resize", () => {
             this.updateDisplay();
+          });
+        }
+
+        initializeAudio() {
+          // Play all sounds once to "unlock" them, then reset and play background music
+          Promise.all([
+            this.swipeSound.play().catch(() => {}),
+            this.pointSound.play().catch(() => {}),
+            this.gameOverSound.play().catch(() => {}),
+            this.backgroundMusic.play().catch(() => {})
+          ]).then(() => {
+            // Pause and reset all sounds except background music
+            this.swipeSound.pause();
+            this.swipeSound.currentTime = 0;
+            this.pointSound.pause();
+            this.pointSound.currentTime = 0;
+            this.gameOverSound.pause();
+            this.gameOverSound.currentTime = 0;
+            // Background music continues playing (loop is set in HTML)
+          }).catch(error => {
+            console.log("Audio initialization failed:", error);
+            // Fallback: Try playing on first interaction
+            this.setupMusicAutoplay();
           });
         }
 
@@ -429,9 +399,10 @@
           this.addRandomTile();
           this.updateDisplay();
           this.gameOverOverlay.style.display = "none";
-          // Restart background music
           this.backgroundMusic.currentTime = 0;
-          this.playBackgroundMusic();
+          this.backgroundMusic.play().catch(error => {
+            console.log("Background music restart failed:", error);
+          });
         }
 
         addFloatingMemes() {
@@ -469,21 +440,14 @@
 
               if (value) {
                 if (this.useTextFallback) {
-                  // Text fallback with meme styling
                   tile.textContent = value;
-
-                  // Apply background color based on value
                   const power = Math.log2(value);
                   const hue = (power * 20) % 360;
                   const lightness = 90 - power * 5;
                   tile.style.backgroundColor = `hsl(${hue}, 90%, ${lightness}%)`;
-
-                  // Adjust text color for readability
                   tile.style.color = power > 5 ? "#f9f6f2" : "#776e65";
                   tile.style.textShadow =
                     power > 5 ? "1px 1px 0px #000" : "none";
-
-                  // Adjust font size for larger numbers
                   if (value >= 1000) {
                     tile.style.fontSize = "clamp(12px, 4vw, 30px)";
                   } else if (value >= 100) {
@@ -491,22 +455,12 @@
                   } else {
                     tile.style.fontSize = "clamp(16px, 5vw, 40px)";
                   }
-
-                  // Add random rotation for meme effect
-                  tile.style.transform = `scale(0.95) rotate(${
-                    (value % 5) - 2
-                  }deg)`;
+                  tile.style.transform = `scale(0.95) rotate(${(value % 5) - 2}deg)`;
                 } else {
-                  // Image-based tiles
                   const img = document.createElement("img");
                   img.src = this.tileImages[value];
                   img.alt = value.toString();
-
-                  // Add slight random rotation for meme effect
-                  img.style.transform = `scale(0.95) rotate(${
-                    (value % 5) - 2
-                  }deg)`;
-
+                  img.style.transform = `scale(0.95) rotate(${(value % 5) - 2}deg)`;
                   tile.appendChild(img);
                 }
               } else {
@@ -534,9 +488,7 @@
           }
         }
 
-        // Show direction indicator
         showDirectionIndicator(direction) {
-          // Create an image element with the appropriate direction image
           this.directionIndicator.innerHTML = "";
           const img = document.createElement("img");
           img.src = this.directionImages[direction];
@@ -544,14 +496,8 @@
           img.style.width = "100%";
           img.style.height = "100%";
           this.directionIndicator.appendChild(img);
-
-          // Remove any existing animation class
           this.directionIndicator.classList.remove("direction-animation");
-
-          // Force reflow
           void this.directionIndicator.offsetWidth;
-
-          // Add animation class
           this.directionIndicator.classList.add("direction-animation");
         }
 
@@ -570,8 +516,6 @@
               if (direction === "down") column.reverse();
               const [merged, points, mergePositions] = this.merge(column);
               scoreIncrease += points;
-
-              // Track merges
               if (mergePositions.length > 0) {
                 for (const pos of mergePositions) {
                   let actualPos = pos;
@@ -579,7 +523,6 @@
                   merges.push({ i: actualPos, j });
                 }
               }
-
               if (direction === "down") merged.reverse();
               for (let i = 0; i < 4; i++) {
                 if (newGrid[i][j] !== merged[i]) moved = true;
@@ -592,8 +535,6 @@
               if (direction === "right") row.reverse();
               const [merged, points, mergePositions] = this.merge(row);
               scoreIncrease += points;
-
-              // Track merges
               if (mergePositions.length > 0) {
                 for (const pos of mergePositions) {
                   let actualPos = pos;
@@ -601,7 +542,6 @@
                   merges.push({ i, j: actualPos });
                 }
               }
-
               if (direction === "right") merged.reverse();
               if (merged.some((val, idx) => val !== newGrid[i][idx]))
                 moved = true;
@@ -610,16 +550,13 @@
           }
 
           if (moved) {
-            // Show direction indicator
             this.showDirectionIndicator(direction);
-            // Play swipe sound
             this.playSwipeSound();
             this.grid = newGrid;
             this.score += scoreIncrease;
             this.addRandomTile();
             this.updateDisplay();
 
-            // Apply merge animations
             if (merges.length > 0) {
               const tiles = document.querySelectorAll(".tile");
               for (const { i, j } of merges) {
@@ -629,8 +566,6 @@
                   tile.classList.remove("merged");
                 }, 300);
               }
-
-              // Play point sound and show WOW effect for big merges
               if (scoreIncrease > 0) {
                 this.playPointSound();
                 if (scoreIncrease >= 16) {
@@ -638,8 +573,6 @@
                 }
               }
             }
-
-            // Check for game over
             if (this.isGameOver()) {
               this.showGameOver();
             }
@@ -653,7 +586,6 @@
             ];
           this.wowEffect.textContent = randomExpression;
           this.wowEffect.classList.remove("wow-animation");
-          // Force reflow
           void this.wowEffect.offsetWidth;
           this.wowEffect.classList.add("wow-animation");
         }
@@ -661,7 +593,6 @@
         showGameOver() {
           this.finalScoreElement.textContent = `Final Score: ${this.score}`;
           this.gameOverOverlay.style.display = "flex";
-          // Stop background music and play game over sound
           this.backgroundMusic.pause();
           this.playGameOverSound();
         }
@@ -686,7 +617,6 @@
         }
 
         isGameOver() {
-          // Check if grid is full
           let emptyCells = false;
           for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 4; j++) {
@@ -695,10 +625,8 @@
               }
             }
           }
-
           if (emptyCells) return false;
 
-          // Check if any moves are possible
           for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 3; j++) {
               if (this.grid[i][j] === this.grid[i][j + 1]) {
@@ -706,7 +634,6 @@
               }
             }
           }
-
           for (let j = 0; j < 4; j++) {
             for (let i = 0; i < 3; i++) {
               if (this.grid[i][j] === this.grid[i + 1][j]) {
@@ -714,7 +641,6 @@
               }
             }
           }
-
           return true;
         }
 
@@ -725,7 +651,6 @@
           let endY = 0;
           let isDragging = false;
 
-          // Prevent scrolling when swiping within the game container
           this.gridElement.addEventListener(
             "touchmove",
             (e) => {
@@ -786,51 +711,39 @@
             }
           });
         }
-        // Audio control methods
-        setupMusicAutoplay() {
-          // Try to play music immediately
-          this.playBackgroundMusic();
 
-          // Add fallback for browsers with strict autoplay policies
+        setupMusicAutoplay() {
           document.addEventListener(
             "click",
             () => {
               if (this.backgroundMusic.paused) {
-                this.playBackgroundMusic();
+                this.backgroundMusic.play().catch(error => {
+                  console.log("Background music click play failed:", error);
+                });
               }
             },
             { once: false }
           );
         }
 
-        playBackgroundMusic() {
-          // Attempt to play with error handling
-          this.backgroundMusic.play().catch((error) => {
-            console.log("Background music autoplay blocked:", error);
-            // Optional: Show a user-friendly message about music
-            console.log("Click anywhere to start music");
-          });
-        }
-
         playSwipeSound() {
-          this.swipeSound.currentTime = 0; // Reset to start
-          this.swipeSound.play();
+          this.swipeSound.currentTime = 0;
+          this.swipeSound.play().catch(() => {});
         }
 
         playPointSound() {
           this.pointSound.currentTime = 0;
-          this.pointSound.play();
+          this.pointSound.play().catch(() => {});
         }
 
         playGameOverSound() {
           this.gameOverSound.currentTime = 0;
-          this.gameOverSound.play();
+          this.gameOverSound.play().catch(() => {});
         }
+
         handleSwipe(startX, startY, endX, endY) {
           const diffX = endX - startX;
           const diffY = endY - startY;
-
-          // Adjust minimum distance based on screen size
           const minDistance =
             Math.min(window.innerWidth, window.innerHeight) * 0.05;
 
@@ -844,7 +757,6 @@
         }
       }
 
-      // Initialize game when page loads
       document.addEventListener("DOMContentLoaded", () => {
         const game = new Game2048();
       });
